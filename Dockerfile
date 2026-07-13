@@ -135,18 +135,28 @@ RUN mkdir -p /app/data && chown sub2api:sub2api /app/data
 COPY deploy/docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 # 强行把环境变量直接锁死在容器系统里
-ENV DATABASE_URL=postgresql://root:2N8a1PbYL71UJ5AC06t3z65prnc9X4de@postgresql:5432/zeabur
-ENV REDIS_URL=redis://:49AD8sHGC11nXPjQBn02hU0675E3eozp@redis:6379/0
-ENV ADMIN_EMAIL=863198106@qq.com
-ENV ADMIN_PASSWORD=20081003
-ENV JWT_SECRET=mysecretkey123456
-ENV TOTP_ENCRYPTION_KEY=1234567890abcdef1234567890abcdef
-ENV AUTO_SETUP=true
-ENV SERVER_PORT=8080
-ENV PORT=8080
+# 切换回 root 用户来写文件和改权限
+USER root
+
+# 在 /app 目录下生成完美的 .env 配置文件
+RUN echo "DATABASE_URL=postgresql://root:2N8a1PbYL7IUj5AC06t3zGSprnc9X4de@postgresql:5432/zeabur" > /app/.env && \
+    echo "REDIS_URL=redis://:49AD8sHGCi1nXPJQbN02hUO675E3eozp@redis:6379/0" >> /app/.env && \
+    echo "ADMIN_EMAIL=863198106@qq.com" >> /app/.env && \
+    echo "ADMIN_PASSWORD=20081003" >> /app/.env && \
+    echo "JWT_SECRET=mysecretkey123456" >> /app/.env && \
+    echo "TOTP_ENCRYPTION_KEY=1234567890abcdef1234567890abcdef" >> /app/.env && \
+    echo "AUTO_SETUP=true" >> /app/.env && \
+    echo "SERVER_PORT=8080" >> /app/.env && \
+    echo "PORT=8080" >> /app/.env
+
+# 【核心破局点】把这个配置文件的所有权，强制交回给程序运行所需的低权限用户
+RUN chown sub2api:sub2api /app/.env
+
+# 切回原装的低权限用户，保证容器安全运行
+USER sub2api
 
 # Expose port
 EXPOSE 8080
 
-# 不走任何脚本，直接把程序拉起来跑！
+# 直接把程序拉起来跑！
 CMD ["./sub2api"]

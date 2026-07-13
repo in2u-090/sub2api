@@ -134,19 +134,13 @@ RUN mkdir -p /app/data && chown sub2api:sub2api /app/data
 # Copy entrypoint script (fixes volume permissions then drops to sub2api)
 COPY deploy/docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
-RUN echo "DATABASE_URL=postgresql://root:2N8a1PbYL71UJ5AC06t3z65prnc9X4de@postgresql:5432/zeabur" > /app/.env && \
-    echo "REDIS_URL=redis://:49AD8sHGC11nXPjQBn02hU0675E3eozp@redis:6379/0" >> /app/.env && \
-    echo "ADMIN_EMAIL=863198106@qq.com" >> /app/.env && \
-    echo "ADMIN_PASSWORD=20081003" >> /app/.env && \
-    echo "JWT_SECRET=mysecretkey123456" >> /app/.env && \
-    echo "TOTP_ENCRYPTION_KEY=1234567890abcdef1234567890abcdef" >> /app/.env && \
-    echo "AUTO_SETUP=true" >> /app/.env && \
-    echo "SERVER_PORT=8080" >> /app/.env && \
-    echo "PORT=8080" >> /app/.env
-
-# Expose port
-EXPOSE 8080
-
-# Run the application
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["/app/sub2api"]
+# 强行把环境变量直接锁死在容器系统里
+ENV DATABASE_URL=postgresql://root:2N8a1PbYL71UJ5AC06t3z65prnc9X4de@postgresql:5432/zeabur
+ENV REDIS_URL=redis://:49AD8sHGC11nXPjQBn02hU0675E3eozp@redis:6379/0
+ENV ADMIN_EMAIL=863198106@qq.com
+ENV ADMIN_PASSWORD=20081003
+ENV JWT_SECRET=mysecretkey123456
+ENV TOTP_ENCRYPTION_KEY=1234567890abcdef1234567890abcdef
+ENV AUTO_SETUP=true
+ENV SERVER_PORT=8080
+ENV PORT=8080

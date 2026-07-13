@@ -144,3 +144,9 @@ ENV TOTP_ENCRYPTION_KEY=1234567890abcdef1234567890abcdef
 ENV AUTO_SETUP=true
 ENV SERVER_PORT=8080
 ENV PORT=8080
+
+# Expose port
+EXPOSE 8080
+
+# 不走任何脚本，直接把程序拉起来跑！
+CMD ["./sub2api"]
